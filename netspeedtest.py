@@ -16,35 +16,44 @@ def test_speed():
     """
     Performs an internet speed test and prints the results.
     """
-    st = speedtest.Speedtest()
+    try:
+        st = speedtest.Speedtest()
 
-    print("Finding the best server...")
-    st.get_best_server() # This selects the nearest server for the most accurate results
+        print("Finding the best server...")
+        st.get_best_server() # This selects the nearest server for the most accurate results
 
-    print("Performing download test...")
-    download_speed = st.download() # Speed in bytes per second
+        print("Performing download test...")
+        download_speed = st.download() # Speed in bytes per second
 
-    print("Performing upload test...")
-    upload_speed = st.upload() # Speed in bytes per second
+        print("Performing upload test...")
+        upload_speed = st.upload() # Speed in bytes per second
 
-    ping_result = st.results.ping # Ping in milliseconds
+        ping_result = st.results.ping # Ping in milliseconds
 
-    # Convert speeds to Mbps (Megabits per second) and format
-    download_speed_mbps = download_speed / 1_000_000
-    upload_speed_mbps = upload_speed / 1_000_000
+        # Convert speeds to Mbps (Megabits per second) and format
+        download_speed_mbps = download_speed / 1_000_000
+        upload_speed_mbps = upload_speed / 1_000_000
 
-    print(f"\n--- Internet Speed Test Results ---")
-    print(f"Download Speed: {color_font(selected_color='red') if download_speed_mbps <= 5 else color_font(selected_color='yellow')}{download_speed_mbps:.2f} Mbps{color_font(selected_color='reset')}")
-    print(f"Upload Speed: {color_font(selected_color='red') if download_speed_mbps <= 5 else color_font(selected_color='yellow')}{upload_speed_mbps:.2f} Mbps{color_font(selected_color='reset')}")
-    print(f"Ping: {ping_result:.2f} ms")
-    print("---------------------------------")
-    print(f"{color_font(selected_color='yellow')}Log time at {time.strftime('%Y-%m-%d %H:%M:%S')}{color_font(selected_color='reset')}")
-    print("Checking again after 15mins...\n")
+        print(f"\n--- Internet Speed Test Results ---")
+        print(f"Download Speed: {color_font(selected_color='red') if download_speed_mbps <= 5 else color_font(selected_color='yellow')}{download_speed_mbps:.2f} Mbps{color_font(selected_color='reset')}")
+        print(f"Upload Speed: {color_font(selected_color='red') if download_speed_mbps <= 5 else color_font(selected_color='yellow')}{upload_speed_mbps:.2f} Mbps{color_font(selected_color='reset')}")
+        print(f"Ping: {color_font(selected_color='green') if ping_result <= 60 else color_font(selected_color='yellow') if ping_result <= 100 else color_font(selected_color='red')}{ping_result:.2f} ms{color_font(selected_color='reset')}")
+        print("---------------------------------")
+        print(f"{color_font(selected_color='yellow')}Log time at {time.strftime('%Y-%m-%d %H:%M:%S')}{color_font(selected_color='reset')}")
+        print("Checking again after 15mins...\n")
 
-    with open('localnetspeedcheck_every15mins.txt', 'a') as log_file:
-        log_file.write(f"Internet Speed Test Results at {time.strftime('%Y-%m-%d %H:%M:%S')}: Download Speed: {download_speed_mbps:.2f} Mbps | Upload Speed: {upload_speed_mbps:.2f} Mbps | Ping: {ping_result:.2f} ms\n")
+        with open('localnetspeedcheck_every15mins.txt', 'a') as log_file:
+            log_file.write(f"Internet Speed Test Results at {time.strftime('%Y-%m-%d %H:%M:%S')}: Download Speed: {download_speed_mbps:.2f} Mbps | Upload Speed: {upload_speed_mbps:.2f} Mbps | Ping: {ping_result:.2f} ms\n")
+        return True
+    except Exception as e:
+        print(f"{color_font(selected_color='red')}error checking internet speed: {str(e)}{color_font(selected_color='reset')}")
+        with open('localnetspeedcheck_every15mins.txt', 'a') as log_file:
+            log_file.write(f"Internet Speed Test Results at {time.strftime('%Y-%m-%d %H:%M:%S')}: error checking internet speed: {str(e)}\n")
+        return False
+
+
 
 if __name__ == "__main__":
     while True:
-        test_speed()
-        time.sleep(15 * 60) # check every 15 mins
+        result = test_speed()
+        time.sleep(15 * 60) if result else time.sleep(10) # check every 15 mins if result is True else, check only after 10 seconds
