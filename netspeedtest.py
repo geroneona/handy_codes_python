@@ -1,5 +1,7 @@
 import speedtest
 import time
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 # ANSI color codes for colored output
 def color_font(selected_color):
@@ -11,6 +13,10 @@ def color_font(selected_color):
         return '\033[93m'
     if selected_color == 'reset':
         return '\033[0m'
+
+# new helper: current time in Philippine timezone (Asia/Manila)
+def philippine_now_str(fmt='%Y-%m-%d %H:%M:%S'):
+    return datetime.now(ZoneInfo("Asia/Manila")).strftime(fmt)
 
 def test_speed():
     """
@@ -39,19 +45,17 @@ def test_speed():
         print(f"Upload Speed: {color_font(selected_color='red') if download_speed_mbps <= 5 else color_font(selected_color='yellow')}{upload_speed_mbps:.2f} Mbps{color_font(selected_color='reset')}")
         print(f"Ping: {color_font(selected_color='green') if ping_result <= 60 else color_font(selected_color='yellow') if ping_result <= 100 else color_font(selected_color='red')}{ping_result:.2f} ms{color_font(selected_color='reset')}")
         print("---------------------------------")
-        print(f"{color_font(selected_color='yellow')}Log time at {time.strftime('%Y-%m-%d %H:%M:%S')}{color_font(selected_color='reset')}")
+        print(f"{color_font(selected_color='yellow')}Log time at {philippine_now_str()}{color_font(selected_color='reset')}")
         print("Checking again after 15mins...\n")
 
         with open('localnetspeedcheck_every15mins.txt', 'a') as log_file:
-            log_file.write(f"Internet Speed Test Results at {time.strftime('%Y-%m-%d %H:%M:%S')}: Download Speed: {download_speed_mbps:.2f} Mbps | Upload Speed: {upload_speed_mbps:.2f} Mbps | Ping: {ping_result:.2f} ms\n")
+            log_file.write(f"Internet Speed Test Results at {philippine_now_str()}: Download Speed: {download_speed_mbps:.2f} Mbps | Upload Speed: {upload_speed_mbps:.2f} Mbps | Ping: {ping_result:.2f} ms\n")
         return True
     except Exception as e:
         print(f"{color_font(selected_color='red')}error checking internet speed: {str(e)}{color_font(selected_color='reset')}")
         with open('localnetspeedcheck_every15mins.txt', 'a') as log_file:
-            log_file.write(f"Internet Speed Test Results at {time.strftime('%Y-%m-%d %H:%M:%S')}: error checking internet speed: {str(e)}\n")
+            log_file.write(f"Internet Speed Test Results at {philippine_now_str()}: error checking internet speed: {str(e)}\n")
         return False
-
-
 
 if __name__ == "__main__":
     while True:
