@@ -15,7 +15,7 @@ def color_font(selected_color):
         return '\033[0m'
 
 # new helper: current time in Philippine timezone (Asia/Manila)
-def philippine_now_str(fmt='%Y-%m-%d %H:%M:%S'):
+def philippine_now_str(fmt='%Y-%m-%d %I:%M:%S %p'):
     return datetime.now(ZoneInfo("Asia/Manila")).strftime(fmt)
 
 def test_speed():
